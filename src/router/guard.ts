@@ -8,7 +8,7 @@ export default function setupGuard(router: Router) {
     const toast = useToast() as any
 
     if (requiresAuth && !token) {
-      toast.add({ title: 'Acceso denegado', description: 'Inicia sesión para acceder a la aplicación' })
+      toast.error('Inicia sesión para acceder a la aplicación')
       return next({ name: 'Login' })
     }
 

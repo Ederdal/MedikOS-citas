@@ -114,10 +114,7 @@ const handleLogin = async () => {
 
     router.replace('/dashboard');
   } catch (error: any) {
-    toast.add({
-      title: 'Error',
-      description: error.response?.data?.message || 'Error al iniciar sesión',
-    })
+    toast.error(error.response?.data?.message || 'Error al iniciar sesión');
   } finally {
     loading.value = false;
   }

@@ -167,11 +167,11 @@ const submitRegister = async () => {
     }
 
     const response = await registerUsuario(payload)
-    toast.add({ title: 'Éxito', description: response.message || 'Registro exitoso', color: 'success' })
+    toast.success(response.message || 'Registro exitoso')
     router.push('/login')
 
   } catch (error: any) {
-    toast.add({ title: 'Error', description: error.message || 'Ocurrió un error al registrar.' })
+    toast.error(error.message || 'Ocurrió un error al registrar.')
   }
 }
 </script>

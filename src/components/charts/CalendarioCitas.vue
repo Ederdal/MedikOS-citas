@@ -279,10 +279,7 @@ function selectDay(day: Day) {
     selectedAppointments.value = day.appointments
     showModal.value = true
   } else {
-    toast.add({
-      title: 'No hay citas',
-      description: `No hay citas para ${formatDate(day.date)}`,
-    })
+    toast.info(`No hay citas para ${formatDate(day.date)}`)
   }
 }
 
