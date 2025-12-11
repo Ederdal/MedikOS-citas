@@ -61,14 +61,20 @@
       </form>
     </div>
 
-    <!-- Información adicional: Notas guardadas en localStorage -->
+    <!-- Información adicional: Notas guardadas en IndexedDB -->
     <div class="w-full md:w-1/4 bg-white rounded-xl shadow-md p-6 animate-fade-on border border-gray-200 self-start">
       <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Notas guardadas</h3>
-      <div v-if="notasRecientes.length === 0" class="text-gray-500 italic text-sm">
+      
+      <div v-if="isLoading" class="text-gray-500 italic text-sm text-center py-4">
+        ⏳ Cargando notas...
+      </div>
+      
+      <div v-else-if="notasRecientes.length === 0" class="text-gray-500 italic text-sm">
         No hay notas guardadas aún
       </div>
-      <ul class="space-y-3 text-sm text-gray-700 max-h-96 overflow-y-auto">
-        <li v-for="(nota, index) in notasRecientes" :key="index" class="p-3 border border-gray-100 rounded-md hover:bg-blue-50 transition">
+      
+      <ul v-else class="space-y-3 text-sm text-gray-700 max-h-96 overflow-y-auto">
+        <li v-for="nota in notasRecientes" :key="nota.id" class="p-3 border border-gray-100 rounded-md hover:bg-blue-50 transition">
           <div class="flex justify-between items-start gap-2">
             <div class="flex-1">
               <p class="font-medium text-blue-600">{{ nota.paciente }}</p>
@@ -76,7 +82,7 @@
               <p class="text-xs text-gray-600 mt-1">💊 <strong>Síntoma:</strong> {{ nota.sintomas }}</p>
               <p class="text-xs text-gray-600">📝 <strong>Tratamiento:</strong> {{ nota.tratamiento }}</p>
             </div>
-            <button @click="eliminarNota(index)" class="text-red-500 hover:text-red-700 text-xs font-bold">
+            <button @click="eliminarNota(nota.id)" class="text-red-500 hover:text-red-700 text-xs font-bold">
               ✕
             </button>
           </div>
@@ -89,8 +95,10 @@
 
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue';
+import { getNotasMedicasDB, type NotaMedica } from '@/services/notasMedicasDB';
 
 const today = new Date().toISOString().split('T')[0];
+const db = getNotasMedicasDB();
 
 const form = reactive({
   paciente: '',
@@ -102,7 +110,8 @@ const form = reactive({
   fechaSeguimiento: ''
 });
 
-const notasRecientes = ref<any[]>([]);
+const notasRecientes = ref<NotaMedica[]>([]);
+const isLoading = ref(false);
 
 const errors = reactive<Record<string, string>>({});
 
@@ -119,36 +128,60 @@ const validateForm = () => {
   return valid;
 };
 
-// Guardar nota en localStorage
-const guardarNotaEnLocalStorage = (nota: any) => {
-  const notasGuardadas = JSON.parse(localStorage.getItem('notasMedicas') || '[]');
-  notasGuardadas.push({
-    ...nota,
-    id: Date.now() // ID único basado en timestamp
-  });
-  localStorage.setItem('notasMedicas', JSON.stringify(notasGuardadas));
+/**
+ * Guarda nota en IndexedDB
+ */
+const guardarNotaEnIndexedDB = async (nota: Omit<NotaMedica, 'id' | 'creadoEn'>) => {
+  try {
+    isLoading.value = true;
+    await db.add(nota);
+  } catch (error) {
+    console.error('Error al guardar nota:', error);
+    alert('❌ Error al guardar la nota');
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-// Cargar notas desde localStorage
-const cargarNotasDesdeLocalStorage = () => {
-  const notasGuardadas = JSON.parse(localStorage.getItem('notasMedicas') || '[]');
-  notasRecientes.value = notasGuardadas.reverse(); // Mostrar las más recientes primero
+/**
+ * Carga notas desde IndexedDB
+ */
+const cargarNotasDesdeIndexedDB = async () => {
+  try {
+    isLoading.value = true;
+    const notas = await db.getAll();
+    notasRecientes.value = notas;
+  } catch (error) {
+    console.error('Error al cargar notas:', error);
+    alert('❌ Error al cargar las notas');
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-// Eliminar nota de localStorage
-const eliminarNota = (index: number) => {
-  const notasGuardadas = JSON.parse(localStorage.getItem('notasMedicas') || '[]');
-  const notaAEliminar = notasRecientes.value[index];
-  const notasActualizadas = notasGuardadas.filter((n: any) => n.id !== notaAEliminar.id);
-  localStorage.setItem('notasMedicas', JSON.stringify(notasActualizadas));
-  cargarNotasDesdeLocalStorage(); // Recargar vista
+/**
+ * Elimina una nota de IndexedDB
+ */
+const eliminarNota = async (id: number | undefined) => {
+  if (!id) return;
+  
+  try {
+    if (confirm('¿Estás seguro de que deseas eliminar esta nota?')) {
+      await db.delete(id);
+      await cargarNotasDesdeIndexedDB();
+      alert('✅ Nota eliminada');
+    }
+  } catch (error) {
+    console.error('Error al eliminar nota:', error);
+    alert('❌ Error al eliminar la nota');
+  }
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (validateForm()) {
     const notaMedica = { ...form };
-    guardarNotaEnLocalStorage(notaMedica);
-    cargarNotasDesdeLocalStorage();
+    await guardarNotaEnIndexedDB(notaMedica);
+    await cargarNotasDesdeIndexedDB();
     
     // Limpiar formulario
     form.paciente = '';
@@ -162,10 +195,11 @@ const handleSubmit = () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   const nombreDoctor = localStorage.getItem('Nombre') || 'Desconocido';
   form.doctor = nombreDoctor;
-  cargarNotasDesdeLocalStorage();
+  await db.init();
+  await cargarNotasDesdeIndexedDB();
 });
 </script>
 
