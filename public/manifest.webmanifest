@@ -1,0 +1,35 @@
+{
+  "name": "MedikOS",
+  "short_name": "MedikOS",
+  "description": "Gestión de citas médicas y administración clínica.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/icons/cardiogram.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/cardiogram.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/img1.jpg",
+      "sizes": "1066x1600",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/img2.jpg",
+      "sizes": "1600x868",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    }
+  ]
+}
