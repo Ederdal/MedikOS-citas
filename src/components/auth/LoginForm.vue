@@ -56,11 +56,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 import { loginUsuario } from '@/services/api/authService';
 import type { LoginPayload } from '@/interfaces/auth';
 
 const router = useRouter();
-const toast = useToast();
+const toast = useToast() as any;
 const loading = ref(false);
 
 const authForm = ref({ usuario: '', password: '' });

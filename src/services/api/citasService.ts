@@ -21,3 +21,32 @@ export const buscarPersonas = async (nombre: string) => {
   })
   return data
 }
+
+export const registrarCita = async (payload: unknown) => {
+  const { data } = await axios.post(`${API_URL}citas/create`, payload, {
+    headers: getAuthHeaders()
+  })
+  return data
+}
+
+export const obtenerServicios = async () => {
+  const { data } = await axios.get(`${API_URL}selects/servicios`, {
+    headers: getAuthHeaders()
+  })
+  return data
+}
+
+export const obtenerEspacios = async () => {
+  const { data } = await axios.get(`${API_URL}selects/espacios`, {
+    headers: getAuthHeaders()
+  })
+  return data
+}
+
+export const obtenerCitasProximas = async (personaId: string) => {
+  const { data } = await axios.get(`${API_URL}citas/proximas/${personaId}`, {
+    headers: getAuthHeaders()
+  })
+  return data
+}
+

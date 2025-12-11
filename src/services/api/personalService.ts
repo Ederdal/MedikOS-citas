@@ -1,5 +1,4 @@
 // routes/empleado.routes.ts
-import type { Empleado } from "@/components/personal/PersonalCard.vue";
 import axios from "axios";
 
 const API_URL: string = import.meta.env.VITE_URL;

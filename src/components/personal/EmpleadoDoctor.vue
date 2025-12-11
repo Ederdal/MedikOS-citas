@@ -1,7 +1,7 @@
 <template>
   <div class="empleado-detail">
     <div v-if="loading">Cargando...</div>
-    <CardEmpleado v-else :empleado="empleado" />
+    <CardEmpleado v-else-if="empleado" :empleado="empleado" />
   </div>
 </template>
 
@@ -22,7 +22,8 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
-        empleado.value = await getDoctorById(id);
+        const idParam = Array.isArray(id) ? id[0] : id;
+        empleado.value = await getDoctorById(idParam ?? '');
       } catch (error) {
         console.error('Error al cargar los datos del doctor:', error);
       } finally {

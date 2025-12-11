@@ -28,11 +28,9 @@ export function useSocket() {
         const data = JSON.parse(event.data);
         console.log("📩 Mensaje recibido:", data);
 
-        if (data.client_id) {
-          chatStore.setClientId(data.client_id);
-        } else if (data.from && data.message) {
+        if (data.from && data.message) {
           // Mensaje privado del chat
-          chatStore.addMessage(data.from, data.message);
+          chatStore.addMessage({ from: data.from, to: data.to ?? '', message: data.message });
         } else if (data.message === "Actualización de personas detectada") {
           // Actualización de gráficas
           const chartData = transformData(data.grupo_sanguineo);

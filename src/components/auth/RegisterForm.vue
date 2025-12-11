@@ -93,13 +93,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { registerUsuario } from '@/services/api/authService'
 import type { RegisterPayload } from '@/interfaces/auth'
+
+type FormKeys = 'username' | 'nombre' | 'primer_apellido' | 'segundo_apellido' | 'genero' | 'fecha_nacimiento' | 'password'
 
 const router = useRouter()
 const toast = useToast()
 
-const form = ref({
+const form = ref<Record<FormKeys, string>>({
   username: '',
   nombre: '',
   primer_apellido: '',
@@ -109,7 +112,7 @@ const form = ref({
   password: ''
 })
 
-const errors = ref<Record<string, string>>({
+const errors = ref<Record<FormKeys, string>>({
   username: '',
   nombre: '',
   primer_apellido: '',
@@ -119,13 +122,13 @@ const errors = ref<Record<string, string>>({
   password: ''
 })
 
-const fields = [
+const fields: Array<{ name: FormKeys; label: string; type: string }> = [
   { name: 'nombre', label: 'Nombre', type: 'text' },
   { name: 'primer_apellido', label: 'Primer Apellido', type: 'text' },
   { name: 'segundo_apellido', label: 'Segundo Apellido', type: 'text' }
 ]
 
-const validateField = (name: string) => {
+const validateField = (name: FormKeys) => {
   const value = form.value[name]
   if (!value) {
     errors.value[name] = 'Este campo es obligatorio.'
@@ -139,8 +142,8 @@ const validateField = (name: string) => {
 }
 
 const validate = () => {
-  let valid = true
-  Object.keys(form.value).forEach((key) => {
+  let valid = true;
+  (Object.keys(form.value) as FormKeys[]).forEach((key: FormKeys) => {
     validateField(key)
     if (!form.value[key]) valid = false
   })
@@ -155,7 +158,13 @@ const submitRegister = async () => {
   if (!validate()) return
 
   try {
-    const payload: RegisterPayload = { ...form.value }
+    const payload: RegisterPayload = {
+      nombre_usuario: form.value.username,
+      contrasena: form.value.password,
+      correo_electronico: `${form.value.username || 'usuario'}@example.com`,
+      numero_telefonico_movil: '0000000000',
+      estatus: 'activo'
+    }
 
     const response = await registerUsuario(payload)
     toast.add({ title: 'Éxito', description: response.message || 'Registro exitoso', color: 'success' })

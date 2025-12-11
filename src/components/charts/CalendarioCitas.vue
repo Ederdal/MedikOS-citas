@@ -81,8 +81,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import axios from 'axios'
+import { useToast } from 'vue-toastification'
 
-const toast = useToast()
+const toast = useToast() as any
 
 // Interfaces
 interface Appointment {

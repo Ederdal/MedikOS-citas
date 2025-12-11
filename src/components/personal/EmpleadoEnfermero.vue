@@ -1,14 +1,14 @@
 <template>
   <div class="empleado-detail">
     <div v-if="loading">Cargando...</div>
-    <CardEmpleado v-else :empleado="empleado" />
+    <CardEmpleado v-else-if="empleado" :empleado="empleado" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { getNurseById } from '@/services/api/personalService';
+import { getNurseById, type Empleado } from '@/services/api/personalService';
 import CardEmpleado from '../dashboard/cards/CardEmpleado.vue';
 
 export default defineComponent({
@@ -16,17 +16,15 @@ export default defineComponent({
   components: { CardEmpleado },
   setup() {
     const route = useRoute();
-    const empleado = ref<{ nombreCompleto: string; departamento: string; email: string }>({
-      nombreCompleto: '',
-      departamento: '',
-      email: ''
-    });
+    const empleado = ref<Empleado | null>(null);
     const loading = ref(true);
     const id = route.params.id;
 
     onMounted(async () => {
       try {
-        empleado.value = await getNurseById(id);
+        const idParam = Array.isArray(id) ? id[0] : id;
+        const data = await getNurseById(idParam ?? '');
+        empleado.value = data as unknown as Empleado;
       } catch (error) {
         console.error('Error al cargar los datos del enfermero:', error);
       } finally {

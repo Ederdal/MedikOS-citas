@@ -30,6 +30,7 @@ export default defineComponent({
 
       // Crear el root de amCharts
       root = am5.Root.new(chartdiv.value);
+      if (!root) return;
       root.setThemes([am5themes_Animated.new(root)]);
 
       // Crear el gráfico XY
@@ -76,7 +77,7 @@ export default defineComponent({
       // Función para crear series (columnas agrupadas) para cada campo (inventario o venta)
       function makeSeries(name: string, fieldName: string, color: am5.Color) {
         const series = chart.series.push(
-          am5xy.ColumnSeries.new(root, {
+          am5xy.ColumnSeries.new(root!, {
             name: name,
             xAxis: xAxis,
             yAxis: yAxis,
@@ -99,7 +100,8 @@ export default defineComponent({
         series.columns.template.adapters.add("fill", (fill, target) => {
           const dataItem = target.dataItem;
           if (dataItem && dataItem.dataContext) {
-            const value = dataItem.dataContext[fieldName];
+            const ctx = dataItem.dataContext as Record<string, number>;
+            const value = ctx[fieldName];
             if (value < lowThreshold) {
               return am5.color(0xff0000); // rojo
             }
@@ -109,7 +111,8 @@ export default defineComponent({
         series.columns.template.adapters.add("stroke", (stroke, target) => {
           const dataItem = target.dataItem;
           if (dataItem && dataItem.dataContext) {
-            const value = dataItem.dataContext[fieldName];
+            const ctx = dataItem.dataContext as Record<string, number>;
+            const value = ctx[fieldName];
             if (value < lowThreshold) {
               return am5.color(0xff0000); // rojo
             }

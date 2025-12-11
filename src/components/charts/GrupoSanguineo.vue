@@ -62,9 +62,7 @@ watch(
         const rootDataItem = series.dataItems[0];
         if (rootDataItem) {
           updateNodeValues(rootDataItem, newData);
-          if (typeof series.invalidateData === "function") {
-            series.invalidateData();
-          }
+          series.data.setAll([newData]);
         }
       }
     }

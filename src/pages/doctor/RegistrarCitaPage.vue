@@ -123,7 +123,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import { buscarPersonas } from '@/services/api/citasService'
+import { buscarPersonas, registrarCita, obtenerServicios, obtenerEspacios, obtenerCitasProximas } from '@/services/api/citasService'
 import user from '@/assets/img/user.png'
 
 // Usuario de sesión (ejemplo, extraído del token)
@@ -256,7 +256,7 @@ const fetchServicios = async () => {
   try {
     const data = await obtenerServicios()
     // Transformamos cada objeto para tener propiedades en minúsculas
-    servicios.value = data.map(s => ({
+    servicios.value = data.map((s: any) => ({
       id: s.ID,
       nombre: s.Nombre,
       // Puedes incluir otros campos si los necesitas
@@ -274,7 +274,7 @@ const fetchServicios = async () => {
 const fetchEspacios = async () => {
   try {
     const data = await obtenerEspacios()
-    espacios.value = data.map(s => ({
+    espacios.value = data.map((s: any) => ({
       id: s.ID,
       nombre: s.Nombre,
       // Puedes incluir otros campos si los necesitas

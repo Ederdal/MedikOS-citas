@@ -4,3 +4,7 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>;
   export default component;
 }
+
+declare module 'virtual:pwa-register' {
+  export function registerSW(options?: { immediate?: boolean }): (reloadPage?: boolean) => void
+}
