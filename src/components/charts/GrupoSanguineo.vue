@@ -49,6 +49,48 @@ onMounted(() => {
 
   grupoStore.loadCachedData();
 
+  // Datos iniciales si no hay caché
+  if (!grupoStore.chartData) {
+    const initialData = {
+      name: "Grupos Sanguíneos",
+      value: 100,
+      children: [
+        {
+          name: "O+",
+          value: 35,
+          children: [
+            { name: "Masculino", value: 18 },
+            { name: "Femenino", value: 17 }
+          ]
+        },
+        {
+          name: "O-",
+          value: 20,
+          children: [
+            { name: "Masculino", value: 10 },
+            { name: "Femenino", value: 10 }
+          ]
+        },
+        {
+          name: "A+",
+          value: 25,
+          children: [
+            { name: "Masculino", value: 12 },
+            { name: "Femenino", value: 13 }
+          ]
+        },
+        {
+          name: "B+",
+          value: 20,
+          children: [
+            { name: "Masculino", value: 11 },
+            { name: "Femenino", value: 9 }
+          ]
+        }
+      ]
+    };
+    grupoStore.setChartData(initialData);
+  }
 
 });
 

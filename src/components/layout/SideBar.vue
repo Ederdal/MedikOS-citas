@@ -248,8 +248,14 @@ import { useGrupoSanguineoStore } from "@/store/useGrupoSanguineoStore";
 import { useSocket } from "@/services/sockets/socket";
 
 const router = useRouter()
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { connect: connectWebSocket, close } = useSocket();
+
+// Conectar WebSocket al montar el componente
+onMounted(() => {
+  if (sessionStorage.getItem('token')) {
+    connectWebSocket();
+  }
+});
 
 // Estados de control
 const isExpanded = ref<boolean>(false)
